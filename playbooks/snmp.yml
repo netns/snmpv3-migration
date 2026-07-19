@@ -1,0 +1,31 @@
+- name: Set up SNMPv3 and disable default public community
+  hosts: mikrotiks
+  gather_facts: false
+
+  tasks:
+    - name: Disable public community
+      community.routeros.command:
+        commands:
+          - /snmp community set [find name=public] disabled=yes
+
+    - name: Set SNMP location and contact
+      community.routeros.command:
+        commands:
+          - >
+            /snmp set
+            contact=contato.dlima@protonmail.com
+            enabled=yes
+            location=casa
+            trap-community=zabbix
+            trap-generators=temp-exception,interfaces,start-trap
+            trap-version=2
+
+    - name: Add zabbix community
+      community.routeros.command:
+        commands:
+          - >
+            /snmp community add
+            name=zabbix
+            addresses=192.168.1.5/32
+            write-access=no
+            read-access=yes
